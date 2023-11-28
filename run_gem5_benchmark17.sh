@@ -2,7 +2,7 @@
 
 ############ DIRECTORY VARIABLES: MODIFY ACCORDINGLY #############
 GEM5_DIR=/home/liuweiding/gem5                        # Install location of gem5
-SPEC_DIR=/home/liuweiding/speccpu2017                  # Install location of your SPEC2006 benchmarks
+SPEC_DIR=/home/liuweiding/spec2017                  # Install location of your SPEC2006 benchmarks
 
 
 # Get command line input. We will need to check these.
@@ -58,11 +58,11 @@ SPECRAND_IS_CODE=998.specrand_is
 SPECRAND_IR_CODE=999.specrand_ir
 
 ##################################################################
- 
+
 # Check BENCHMARK input
 #################### BENCHMARK CODE MAPPING ######################
 BENCHMARK_CODE="none"
- 
+
 if [[ "$BENCHMARK" == "perlbench_r" ]]; then
     BENCHMARK_CODE=$PERLBENCH_R_CODE
 fi
@@ -211,7 +211,7 @@ if [[ "$BENCHMARK_CODE" == "none" ]]; then
     exit 1
 fi
 ##################################################################
- 
+
 # Check OUTPUT_DIR existence
 # if [[ !(-d "$OUTPUT_DIR") ]]; then
 #     echo "Output directory $OUTPUT_DIR does not exist! Exiting."
@@ -228,9 +228,9 @@ fi
 # RUN_DIR=$SPEC_DIR/benchspec/CPU/$BENCHMARK_CODE/build/build_base\_my-riscv-64.0000     # Run directory for the selected SPEC benchmark
 
 SCRIPT_OUT=$OUTPUT_DIR/runscript.log                                                                    # File log for this script's stdout henceforth
- 
+
 ################## REPORT SCRIPT CONFIGURATION ###################
- 
+
 echo "Command line:"                                | tee $SCRIPT_OUT
 echo "$0 $*"                                        | tee -a $SCRIPT_OUT
 echo "================= Hardcoded directories ==================" | tee -a $SCRIPT_OUT
@@ -241,21 +241,21 @@ echo "BENCHMARK:                                    $BENCHMARK" | tee -a $SCRIPT
 echo "OUTPUT_DIR:                                   $OUTPUT_DIR" | tee -a $SCRIPT_OUT
 echo "==========================================================" | tee -a $SCRIPT_OUT
 ##################################################################
- 
- 
+
+
 #################### LAUNCH GEM5 SIMULATION ######################
 echo ""
 echo "Changing to SPEC benchmark runtime directory: $RUN_DIR" | tee -a $SCRIPT_OUT
 cd $RUN_DIR
 rm -rf m5out
 rm -f baseout
- 
+
 echo "" | tee -a $SCRIPT_OUT
 echo "" | tee -a $SCRIPT_OUT
 echo "--------- Starting gem5! ------------" | tee -a $SCRIPT_OUT
 echo "" | tee -a $SCRIPT_OUT
 echo "" | tee -a $SCRIPT_OUT
- 
+
 
 BOOM_FLAGS="--cpu-type=RiscvO3CPU \
 --bp-type=BiModeBP \
