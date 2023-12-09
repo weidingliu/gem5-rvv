@@ -262,6 +262,8 @@ LSQUnit::LSQUnitStats::LSQUnitStats(statistics::Group *parent)
                "squashed"),
       ADD_STAT(memOrderViolation, statistics::units::Count::get(),
                "Number of memory ordering violations"),
+      ADD_STAT(VecMemOrderViolation, statistics::units::Count::get(),
+               "Number of Vector memory ordering violations"),
       ADD_STAT(squashedStores, statistics::units::Count::get(),
                "Number of stores squashed"),
       ADD_STAT(rescheduledLoads, statistics::units::Count::get(),
@@ -269,10 +271,15 @@ LSQUnit::LSQUnitStats::LSQUnitStats(statistics::Group *parent)
       ADD_STAT(blockedByCache, statistics::units::Count::get(),
                "Number of times an access to memory failed due to the cache "
                "being blocked"),
+      ADD_STAT(vecLoadToUse, "Distribution of cycle latency between the "
+                "first time a vector load is issued and its completion"),
       ADD_STAT(loadToUse, "Distribution of cycle latency between the "
                 "first time a load is issued and its completion")
 {
     loadToUse
+        .init(0, 299, 10)
+        .flags(statistics::nozero);
+    vecLoadToUse
         .init(0, 299, 10)
         .flags(statistics::nozero);
 }
@@ -543,6 +550,7 @@ LSQUnit::checkViolations(typename LoadQueue::iterator& loadIt,
                         memDepViolator = ld_inst;
 
                         ++stats.memOrderViolation;
+                        if(inst->isVector()) ++stats.VecMemOrderViolation;
 
                         return std::make_shared<GenericISA::M5PanicFault>(
                             "Detected fault with inst [sn:%lli] and "
@@ -570,6 +578,7 @@ LSQUnit::checkViolations(typename LoadQueue::iterator& loadIt,
                 memDepViolator = ld_inst;
 
                 ++stats.memOrderViolation;
+                if(inst->isVector()) ++stats.VecMemOrderViolation;
 
                 return std::make_shared<GenericISA::M5PanicFault>(
                     "Detected fault with "
@@ -732,6 +741,10 @@ LSQUnit::commitLoad()
             && inst->lastWakeDependents != -1) {
         stats.loadToUse.sample(cpu->ticksToCycles(
                     inst->lastWakeDependents - inst->firstIssue));
+        if(inst->isVector()){
+            stats.vecLoadToUse.sample(cpu->ticksToCycles(
+                    inst->lastWakeDependents - inst->firstIssue));
+        }
     }
 
     loadQueue.front().clear();

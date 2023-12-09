@@ -526,6 +526,9 @@ class LSQUnit
         /** Tota number of memory ordering violations. */
         statistics::Scalar memOrderViolation;
 
+        /** vector violations**/
+        statistics::Scalar VecMemOrderViolation;
+
         /** Total number of squashed stores. */
         statistics::Scalar squashedStores;
 
@@ -534,6 +537,9 @@ class LSQUnit
 
         /** Number of times the LSQ is blocked due to the cache. */
         statistics::Scalar blockedByCache;
+
+        /*Distribution of cycle between vector load is issue and its completion*/
+        statistics::Distribution vecLoadToUse;
 
         /** Distribution of cycle latency between the first time a load
          * is issued and its completion */

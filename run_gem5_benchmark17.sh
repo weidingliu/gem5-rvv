@@ -272,7 +272,7 @@ BOOM_FLAGS="--cpu-type=RiscvO3CPU \
 --mem-size=8192MB \
 --standard-switch=10 \
 --warmup-insts=10000000 \
--I 1000000"
+-I 300000000"
 
 
 
