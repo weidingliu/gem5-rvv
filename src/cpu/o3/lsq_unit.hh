@@ -541,6 +541,9 @@ class LSQUnit
         /*Distribution of cycle between vector load is issue and its completion*/
         statistics::Distribution vecLoadToUse;
 
+        /*Distribution of cycle betwen violation vector load is issue and its completion*/
+        statistics::Distribution vecViolationLoadToUse;
+
         /** Distribution of cycle latency between the first time a load
          * is issued and its completion */
         statistics::Distribution loadToUse;

@@ -273,6 +273,8 @@ LSQUnit::LSQUnitStats::LSQUnitStats(statistics::Group *parent)
                "being blocked"),
       ADD_STAT(vecLoadToUse, "Distribution of cycle latency between the "
                 "first time a vector load is issued and its completion"),
+      ADD_STAT(vecViolationLoadToUse,"Distribution of cycle latency between the "
+                "first time a violation vector load is issued and its completion"),
       ADD_STAT(loadToUse, "Distribution of cycle latency between the "
                 "first time a load is issued and its completion")
 {
@@ -280,6 +282,9 @@ LSQUnit::LSQUnitStats::LSQUnitStats(statistics::Group *parent)
         .init(0, 299, 10)
         .flags(statistics::nozero);
     vecLoadToUse
+        .init(0, 299, 10)
+        .flags(statistics::nozero);
+    vecViolationLoadToUse
         .init(0, 299, 10)
         .flags(statistics::nozero);
 }
@@ -741,10 +746,14 @@ LSQUnit::commitLoad()
             && inst->lastWakeDependents != -1) {
         stats.loadToUse.sample(cpu->ticksToCycles(
                     inst->lastWakeDependents - inst->firstIssue));
-        if(inst->isVector()){
+        if(inst->isVector() && !inst->possibleLoadViolation()){
             stats.vecLoadToUse.sample(cpu->ticksToCycles(
                     inst->lastWakeDependents - inst->firstIssue));
         }
+        // if(inst->isVector() && inst->possibleLoadViolation()){
+        //     stats.vecViolationLoadToUse.sample(cpu->ticksToCycles(
+        //             inst->lastWakeDependents - inst->firstIssue));
+        // }
     }
 
     loadQueue.front().clear();
