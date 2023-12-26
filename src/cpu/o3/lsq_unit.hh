@@ -542,7 +542,7 @@ class LSQUnit
         statistics::Distribution vecLoadToUse;
 
         /*Distribution of cycle betwen violation vector load is issue and its completion*/
-        statistics::Distribution vecViolationLoadToUse;
+        statistics::Distribution scaleLoadToUse;
 
         /** Distribution of cycle latency between the first time a load
          * is issued and its completion */
