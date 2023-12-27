@@ -103,6 +103,8 @@ class LSQUnit
         uint32_t _size = 0;
         /** Valid entry. */
         bool _valid = false;
+        
+        bool _voilation = false;
 
       public:
         ~LSQEntry()
@@ -123,6 +125,7 @@ class LSQUnit
             _request = nullptr;
             _valid = false;
             _size = 0;
+            _voilation = false;
         }
 
         void
@@ -143,6 +146,11 @@ class LSQUnit
         uint32_t& size() { return _size; }
         const uint32_t& size() const { return _size; }
         const DynInstPtr& instruction() const { return _inst; }
+        void setViolation()
+        {
+          _voilation = true;
+        }
+        bool isViolation() {return _voilation; }
         /** @} */
     };
 
@@ -541,7 +549,10 @@ class LSQUnit
         /*Distribution of cycle between vector load is issue and its completion*/
         statistics::Distribution vecLoadToUse;
 
-        /*Distribution of cycle betwen violation vector load is issue and its completion*/
+        /*Distribution of cycle between violation vector load is issue and its completion*/
+        statistics::Distribution vecViolationLoadToUse;
+
+        /*Distribution of cycle betwen violation scale load is issue and its completion*/
         statistics::Distribution scaleLoadToUse;
 
         /** Distribution of cycle latency between the first time a load

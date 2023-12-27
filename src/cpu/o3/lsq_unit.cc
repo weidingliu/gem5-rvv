@@ -273,6 +273,8 @@ LSQUnit::LSQUnitStats::LSQUnitStats(statistics::Group *parent)
                "being blocked"),
       ADD_STAT(vecLoadToUse, "Distribution of cycle latency between the "
                 "first time a vector load is issued and its completion"),
+      ADD_STAT(vecViolationLoadToUse, "Distribution of cycle latency between the "
+                "first time a violation vector load is issued and its completion"),
       ADD_STAT(scaleLoadToUse,"Distribution of cycle latency between the "
                 "first time a scale load is issued and its completion"),
       ADD_STAT(loadToUse, "Distribution of cycle latency between the "
@@ -285,6 +287,9 @@ LSQUnit::LSQUnitStats::LSQUnitStats(statistics::Group *parent)
         .init(0, 299, 10)
         .flags(statistics::nozero);
     scaleLoadToUse
+        .init(0, 299, 10)
+        .flags(statistics::nozero);
+    vecViolationLoadToUse
         .init(0, 299, 10)
         .flags(statistics::nozero);
 }
@@ -556,6 +561,8 @@ LSQUnit::checkViolations(typename LoadQueue::iterator& loadIt,
 
                         ++stats.memOrderViolation;
                         if(inst->isVector()) ++stats.VecMemOrderViolation;
+                        loadIt->setViolation();
+                        printf("set violation %d\n",loadIt->isViolation());
 
                         return std::make_shared<GenericISA::M5PanicFault>(
                             "Detected fault with inst [sn:%lli] and "
@@ -584,6 +591,8 @@ LSQUnit::checkViolations(typename LoadQueue::iterator& loadIt,
 
                 ++stats.memOrderViolation;
                 if(inst->isVector()) ++stats.VecMemOrderViolation;
+                loadIt->setViolation();
+                printf("set violation %d\n",loadIt->isViolation());
 
                 return std::make_shared<GenericISA::M5PanicFault>(
                     "Detected fault with "
@@ -735,6 +744,7 @@ LSQUnit::commitLoad()
     assert(loadQueue.front().valid());
 
     DynInstPtr inst = loadQueue.front().instruction();
+    bool isViolation = loadQueue.front().isViolation();
 
     DPRINTF(LSQUnit, "Committing head load instruction, PC %s\n",
             inst->pcState());
@@ -749,6 +759,10 @@ LSQUnit::commitLoad()
         if(inst->isVector()){
             stats.vecLoadToUse.sample(cpu->ticksToCycles(
                     inst->lastWakeDependents - inst->firstIssue));
+            if(isViolation) {
+                stats.vecViolationLoadToUse.sample(cpu->ticksToCycles(
+                    inst->lastWakeDependents - inst->firstIssue));
+            }
         }
         if(!inst->isVector()){
             stats.scaleLoadToUse.sample(cpu->ticksToCycles(
