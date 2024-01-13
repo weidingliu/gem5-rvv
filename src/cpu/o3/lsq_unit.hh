@@ -104,6 +104,8 @@ class LSQUnit
         /** Valid entry. */
         bool _valid = false;
 
+       bool _voilation = false;
+
       public:
         ~LSQEntry()
         {
@@ -144,6 +146,15 @@ class LSQUnit
         const uint32_t& size() const { return _size; }
         const DynInstPtr& instruction() const { return _inst; }
         /** @} */
+        void setViolation()
+        {
+          _voilation = true;
+        }
+        void unSetViolation()
+        {
+          _voilation = false;
+        }
+        bool isViolation() {return _voilation; }
     };
 
     class SQEntry : public LSQEntry
@@ -526,6 +537,9 @@ class LSQUnit
         /** Tota number of memory ordering violations. */
         statistics::Scalar memOrderViolation;
 
+        /** vector violations**/
+        statistics::Scalar VecMemOrderViolation;
+
         /** Total number of squashed stores. */
         statistics::Scalar squashedStores;
 
@@ -534,6 +548,14 @@ class LSQUnit
 
         /** Number of times the LSQ is blocked due to the cache. */
         statistics::Scalar blockedByCache;
+        /*Distribution of cycle between vector load is issue and its completion*/
+        statistics::Distribution vecLoadToUse;
+
+        /*Distribution of cycle between violation vector load is issue and its completion*/
+        statistics::Distribution vecViolationLoadToUse;
+
+        /*Distribution of cycle betwen violation scale load is issue and its completion*/
+        statistics::Distribution scaleLoadToUse;
 
         /** Distribution of cycle latency between the first time a load
          * is issued and its completion */
